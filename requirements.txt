@@ -1,0 +1,7 @@
+scipy
+numpy
+tensorflow
+flask
+gunicorn
+flask_cors
+gensim
