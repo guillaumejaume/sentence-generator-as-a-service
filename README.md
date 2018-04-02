@@ -1,6 +1,6 @@
 # Flask API to generate random sentences
 
-The implementation of this service is still running and should  therefore not be used as it is.
+*CODE UNDER DEVELOPMENT*
 
 - Code derived from: https://github.com/guillaumegenthial/api_ner.git
 
