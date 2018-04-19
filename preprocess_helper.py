@@ -1,8 +1,6 @@
 import numpy as np
 import string
 from collections import defaultdict
-import random
-
 
 def load_raw_data(filename):
     """ Load a file and read it line-by-line
@@ -43,14 +41,14 @@ def add_tokens_to_sentences(raw_sentences, vocab, max_sent_length, eos_token=Tru
     Parameters:
     -----------
     raw_sentences: list of string
-    list of sentences, where each word is already separated by a space char
+        list of sentences, where each word is already separated by a space char
     max_sent_lenght: int
-    maximal size authorized for a sentence, if longer than it is discarded
+        maximal size authorized for a sentence, if longer than it is discarded
 
     Returns:
     --------
     normalized_sentences: list of string
-    sentences normalized following the process described in the handout task 1), 1a)
+        sentences normalized as indices following the process described in the handout task 1), 1a)
     """
     sentences_with_indices = []
     labels_with_indices = []
@@ -72,87 +70,115 @@ def add_tokens_to_sentences(raw_sentences, vocab, max_sent_length, eos_token=Tru
 
 
 def replace_unknown_words(input_sentences, vocab):
-  """ replace all the words that don't belong to
-    a list of known words with the token <unk>
-    Parameters:
-    -----------
-    input_sentences: list of string
-        list of sentences, where each word is already separated by a space char
-    vocab: dict of words
-        dict of the common words
-    
-    Returns:
-    --------
-    output_sentences: list of string
-    sentences where each unknown word was replaced by <unk>
-    """
-  # argsort all the words from each sentence
-  all_words = []
-  for sentence in input_sentences:
-    sentence = remove_punctuation_and_digits_from_line(sentence)
-    if sentence and not sentence.isspace():
-      all_words.extend(sentence.split())
-      all_words.extend('\n')
-  indices = argsort(all_words)
+    """ replace all the words that don't belong to
+      a list of known words with the token <unk>
+      Parameters:
+      -----------
+      input_sentences: list of string
+          list of sentences, where each word is already separated by a space char
+      vocab: dict of words
+          dict of the common words
 
-  # replace by <unk> when necessary
-  current_word = ''
-  replace = False
-  for idx in indices:
-    if not all_words[idx] == '\n':
-      if current_word == all_words[idx]:
-        if replace:
-          all_words[idx] = '<unk>'
-      else:
-        replace = False
-        current_word = all_words[idx]
-        if not current_word in vocab.keys():
-          all_words[idx] = '<unk>'
-          replace = True
+      Returns:
+      --------
+      output_sentences: list of string
+      sentences where each unknown word was replaced by <unk>
+      """
+    # argsort all the words from each sentence
+    all_words = []
+    for sentence in input_sentences:
+        if sentence and not sentence.isspace():
+            all_words.extend(sentence.split())
+            all_words.extend('\n')
+    indices = argsort(all_words)
 
-  # reconstruct the sentences
-  output_sentences = []
-  sentence = ''
-  for word in all_words:
-    if word == '\n':
-      output_sentences.append(' '.join(sentence.split()))
-      sentence = ''
-    else:
-      sentence += word
-      sentence += ' '
+    # replace by <unk> when necessary
+    current_word = ''
+    replace = False
+    for idx in indices:
+        if not all_words[idx] == '\n':
+            if current_word == all_words[idx]:
+                if replace:
+                    all_words[idx] = '<unk>'
+            else:
+                replace = False
+                current_word = all_words[idx]
+                if not current_word in vocab.keys():
+                    all_words[idx] = '<unk>'
+                    replace = True
 
-  return output_sentences
+    # reconstruct the sentences
+    output_sentences = []
+    sentence = ''
+    for word in all_words:
+        if word == '\n':
+            output_sentences.append(' '.join(sentence.split()))
+            sentence = ''
+        else:
+            sentence += word
+            sentence += ' '
+
+    return output_sentences
 
 
-def load_frequent_words(frequent_word_filename):
-    frequent_words = load_raw_data(frequent_word_filename)
-    frequent_words = [word.rstrip() for word in frequent_words]
-    vocab = {word: i for i, word in enumerate(frequent_words)}
-    return vocab
+def load_frequent_words_and_embeddings(frequent_word_filename):
+    """ Load the list of frequent words and their embeddings
+      Parameters:
+      -----------
+      frequent_word_filename: path to file
+          text file where each line is a freq word to parse
+
+      Returns:
+      --------
+      vocab: dict
+        - the keys are the freq words
+        - the values are the indices
+      embeddings: dict
+        - the keys are the freq words
+        - the values are the embeddings
+      """
+    lines_of_data = load_raw_data(frequent_word_filename)
+    lines_of_data = [line.rstrip() for line in lines_of_data]
+
+    #Avoids the for loop but calls the split function 4 times
+    #vocab = {line.split()[0]: line.split()[1] for line.split() in lines_of_data}
+    #embeddings = {line.split()[0]: line.split()[2:] for line in lines_of_data}
+
+    vocab={}
+    embeddings={}
+    for line in lines_of_data:
+        line_as_array = line.split()
+        vocab[line_as_array[0]]=int(line_as_array[1])
+        embeddings[line_as_array[0]]=line_as_array[2:]
+    return vocab, embeddings
 
 
 def load_and_process_data(filename, vocab, max_sent_length, eos_token=True, pad_sentence=True):
+    """ Load the list of frequent words
+      Parameters:
+      -----------
+      filename: string
+          path to file containing the raw data (ie. the sentences)
+    vocab: dict
+        - the keys are the freq words
+        - the values are the indices
+    max_sent_length: int
+        max authorized length for a sentence
+    eos_token: bool (default=True)
+        if the token <eos> should be added at the end of each sentence
+    pas_sentence: bool (default=True)
+        if the sentences should be padded to match the max_sent_length
+
+      Returns:
+      --------
+      vocab: dict
+        - the keys are the freq words
+        - the values are the indices
+      """
     raw_data = load_raw_data(filename)
     data = replace_unknown_words(raw_data, vocab)
     data, labels = add_tokens_to_sentences(data, vocab, max_sent_length, eos_token, pad_sentence)
     return data, labels
-
-
-def remove_punctuation_and_digits_from_line(line):
-    """ Removes the punctuation and the digits from line
-    Parameters:
-    -----------
-    line: string
-    line from which the punctuation and the digits should be removed
-    
-    Returns:
-    line: string
-    line with removed punctuation and digits
-    
-    """
-    #https://stackoverflow.com/questions/265960/best-way-to-strip-punctuation-from-a-string-in-python
-    line = line.translate(str.maketrans('', '', string.punctuation))
-    return line
 
 
 def batch_iter(data, batch_size, num_epochs, shuffle=True):
@@ -175,30 +201,25 @@ def batch_iter(data, batch_size, num_epochs, shuffle=True):
             yield shuffled_data[start_index:end_index]
 
 
-def generate_top_k_words(file_name, remove_punctuation, k):
+def generate_top_k_words_and_their_emb(file_name, k, embedding_dimension):
     """ Generates k most frequent words
     Parameters:
     -----------
     filename: string
     path to the file to load
     
-    remove_punctuation: bool
-    defines whether the punctuation is removed or not
-    
     k: int
     number of words 
     
     Returns:
     --------
-    top_k_frequent_words: list 
-    the most frequent k words
+    top_k_frequent_words_and_embedding_pairs: list
+    the most frequent k words with their embeddings
     """
+    extra_words = ['<unk>', '<pad>', '<bos>', '<eos>']
     raw_lines_of_data = load_raw_data(file_name)
     lines = []
-    if remove_punctuation:
-        lines.extend(remove_punctuation_and_digits_from_line(line.rstrip('\n')) for line in raw_lines_of_data)
-    else:
-        lines.extend(line.rstrip('\n') for line in raw_lines_of_data)
+    lines.extend(line.rstrip('\n') for line in raw_lines_of_data)
     words = []
     for line in lines:
         words.extend(line.split())
@@ -209,21 +230,28 @@ def generate_top_k_words(file_name, remove_punctuation, k):
     
     frequency_dictionary = sorted(frequency_dictionary.items(), key=lambda item: item[1], reverse=True)
     top_k_frequent_key_pairs = frequency_dictionary[:k]
-    top_k_frequent_words = [key_pair[0] for key_pair in top_k_frequent_key_pairs]
-    
-    return top_k_frequent_words
+    top_k_frequent_words_and_embedding_pairs = [(key_pair[0],i, np.random.uniform(low=-1, high=1, size=embedding_dimension)) for i, key_pair in enumerate(top_k_frequent_key_pairs)]
+    top_k_frequent_words_and_embedding_pairs.extend((extra_word, k+i, np.random.uniform(low=-1, high=1, size=embedding_dimension)) for i,extra_word in enumerate(extra_words))
+
+    return top_k_frequent_words_and_embedding_pairs
 
 
-def write_list_to_file(string_list, filename):
+def write_list_to_file(tuple_map, filename):
     """ Writes list of items in a file, each item on a separated line
     Parameters:
-    string_list: list
-    list to be written
+    tuple_map: map
+    tuple_map to be written
     
     filename: string
     file name
     """
+
     file = open(filename, "w")
-    for item in string_list:
-        file.write("%s\n" % item)
+    for item in tuple_map:
+        file.write("%s %s " % (str(item[0]), str(item[1])))
+        for element in item[2]:
+            file.write("%s " % str(element))
+        file.write("\n")
     file.close()
+
+

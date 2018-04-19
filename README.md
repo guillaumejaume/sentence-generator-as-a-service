@@ -1,15 +1,12 @@
 # Flask API to generate random sentences
 
-*CODE UNDER DEVELOPMENT*
+Currently deploy on Heroku as lstm-based-language-model
 
-- Code derived from: https://github.com/guillaumegenthial/api_ner.git
+The implementation of this service is still running and should  therefore not be used as it is.
 
-- Currently model stored in Git LFS (Large File Storage), which is not supported by Heroku for
-deployment.
+- Code derived from: https://github.com/guillaumejaume/sentence-generator-as-a-service.git
 
 - To run the code:
-  - Create Heroku app
-  - Deploy the code on Heroku git
   - Open app
   - Open the client
 
