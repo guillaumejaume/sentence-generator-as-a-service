@@ -39,7 +39,7 @@
         $('#spinner').toggle();
 
         $.ajax({
-            url: "https://lstm-based-language-model.herokuapp.com/api",
+            url: "http://0.0.0.0:5000/api",
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(input),
