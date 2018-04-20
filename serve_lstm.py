@@ -15,7 +15,7 @@ def get_model_api():
     use_word2vec_emb = True
     vocab, generated_embeddings = preprocess_helper.load_frequent_words_and_embeddings("data/vocab_with_emb.txt")
     print("- Load checkpoint")
-    checkpoint_file = tf.train.latest_checkpoint("model/pretrained_w2v_hidden_layer_512/checkpoints/")
+    checkpoint_file = tf.train.latest_checkpoint("model/pretrained_w2v_hidden_layer_1024/checkpoints/")
     graph = tf.Graph()
     with graph.as_default():
         session_conf = tf.ConfigProto(
