@@ -1,12 +1,29 @@
-# Flask API to generate random sentences
+# Random sentence generator
 
-Currently deploy on Heroku as lstm-based-language-model
+![GitHub Logo](/data/ui_example.png)
 
-The implementation of this service is still running and should  therefore not be used as it is.
+## How to install locally? 
 
-- Code derived from: https://github.com/guillaumejaume/sentence-generator-as-a-service.git
+The *client* and the *Flask API* are derived from: https://github.com/guillaumejaume/sentence-generator-as-a-service.git
 
-- To run the code:
-  - Open app
-  - Open the client
+The following requirements are needed: 
+  - numpy
+  - tensorflow==1.5
+  - flask
+  - gunicorn
+  - gensim
+ 
+To run the service:
+  - run *app.py*. 
+  - open in your favorite browser the client stored in *client/client.html*. 
+  - enjoy the service... 
 
+## How to deploy ?
+
+- Heroku (with *requirements.txt*, *Procfile*, *runtime.txt*)
+- ... 
+
+## Examples
+
+- Input: *"i like"*
+- Output: *"i like you , and i want you to know what i 've done ."*
