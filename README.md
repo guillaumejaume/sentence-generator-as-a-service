@@ -4,7 +4,7 @@
 
 ## How to install locally? 
 
-The *client* and the *Flask API* are derived from: https://github.com/guillaumejaume/sentence-generator-as-a-service.git
+The *client* and the *Flask API* are derived from: https://github.com/guillaumegenthial/api_ner
 
 The following requirements are needed: 
   - numpy
